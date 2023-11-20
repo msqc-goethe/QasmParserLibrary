@@ -34,5 +34,5 @@ target_link_libraries(openqasmparser PUBLIC fmt::fmt TBB::tbb Threads::Threads O
 
 install(TARGETS openqasmparser
 		COMPONENT python
-		LIBRARY DESTINATION "/Users/cedricgaberle/opt/anaconda3/envs/quantum_envs/lib/python3.10/site-packages"
+		LIBRARY DESTINATION "${PYTHON_LIBRARY_DIR}"
 )
