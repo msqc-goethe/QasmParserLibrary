@@ -42,25 +42,23 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/QasmParserLib/cmake_install.cmake")
 endif()
 
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/pybind11/cmake_install.cmake")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "python" OR NOT CMAKE_INSTALL_COMPONENT)
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xpythonx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/usr/local/lib/python3.10/site-packages/openQasmParser.cpython-310-darwin.so")
+   "/Users/cedricgaberle/opt/anaconda3/envs/quantum_env/lib/python3.10/site-packages/openqasmparser.cpython-310-darwin.so")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/usr/local/lib/python3.10/site-packages" TYPE MODULE FILES "/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/openQasmParser.cpython-310-darwin.so")
-  if(EXISTS "$ENV{DESTDIR}/usr/local/lib/python3.10/site-packages/openQasmParser.cpython-310-darwin.so" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/usr/local/lib/python3.10/site-packages/openQasmParser.cpython-310-darwin.so")
+  file(INSTALL DESTINATION "/Users/cedricgaberle/opt/anaconda3/envs/quantum_env/lib/python3.10/site-packages" TYPE MODULE FILES "/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/openqasmparser.cpython-310-darwin.so")
+  if(EXISTS "$ENV{DESTDIR}/Users/cedricgaberle/opt/anaconda3/envs/quantum_env/lib/python3.10/site-packages/openqasmparser.cpython-310-darwin.so" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/Users/cedricgaberle/opt/anaconda3/envs/quantum_env/lib/python3.10/site-packages/openqasmparser.cpython-310-darwin.so")
+    execute_process(COMMAND /usr/bin/install_name_tool
+      -delete_rpath "/usr/local/lib"
+      "$ENV{DESTDIR}/Users/cedricgaberle/opt/anaconda3/envs/quantum_env/lib/python3.10/site-packages/openqasmparser.cpython-310-darwin.so")
     if(CMAKE_INSTALL_DO_STRIP)
-      execute_process(COMMAND "/usr/bin/strip" -x "$ENV{DESTDIR}/usr/local/lib/python3.10/site-packages/openQasmParser.cpython-310-darwin.so")
+      execute_process(COMMAND "/usr/bin/strip" -x "$ENV{DESTDIR}/Users/cedricgaberle/opt/anaconda3/envs/quantum_env/lib/python3.10/site-packages/openqasmparser.cpython-310-darwin.so")
     endif()
   endif()
 endif()

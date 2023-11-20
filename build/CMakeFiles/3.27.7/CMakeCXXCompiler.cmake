@@ -81,6 +81,6 @@ set(CMAKE_CXX_SYSROOT_FLAG "-isysroot")
 set(CMAKE_CXX_OSX_DEPLOYMENT_TARGET_FLAG "-mmacosx-version-min=")
 
 set(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES "/usr/local/Cellar/gcc/13.2.0/include/c++/13;/usr/local/Cellar/gcc/13.2.0/include/c++/13/x86_64-apple-darwin22;/usr/local/Cellar/gcc/13.2.0/include/c++/13/backward;/usr/local/Cellar/gcc/13.2.0/lib/gcc/current/gcc/x86_64-apple-darwin22/13/include;/usr/local/Cellar/gcc/13.2.0/lib/gcc/current/gcc/x86_64-apple-darwin22/13/include-fixed;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/System/Library/Frameworks")
-set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "d_classic;stdc++;gcc_s.1.1;gcc")
+set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "stdc++;gcc_s.1.1;gcc")
 set(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "/usr/local/Cellar/gcc/13.2.0/lib/gcc/current/gcc/x86_64-apple-darwin22/13;/usr/local/Cellar/gcc/13.2.0/lib/gcc/current/gcc;/usr/local/Cellar/gcc/13.2.0/lib/gcc/current")
 set(CMAKE_CXX_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "")

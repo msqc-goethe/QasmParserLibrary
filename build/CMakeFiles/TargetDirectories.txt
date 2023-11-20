@@ -1,4 +1,4 @@
-/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/CMakeFiles/openQasmParser.dir
+/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/CMakeFiles/openqasmparser.dir
 /Users/cedricgaberle/CLionProjects/QasmParser/Library/build/CMakeFiles/edit_cache.dir
 /Users/cedricgaberle/CLionProjects/QasmParser/Library/build/CMakeFiles/rebuild_cache.dir
 /Users/cedricgaberle/CLionProjects/QasmParser/Library/build/CMakeFiles/list_install_components.dir
@@ -12,9 +12,3 @@
 /Users/cedricgaberle/CLionProjects/QasmParser/Library/build/QasmParserLib/CMakeFiles/install.dir
 /Users/cedricgaberle/CLionProjects/QasmParser/Library/build/QasmParserLib/CMakeFiles/install/local.dir
 /Users/cedricgaberle/CLionProjects/QasmParser/Library/build/QasmParserLib/CMakeFiles/install/strip.dir
-/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/pybind11/CMakeFiles/edit_cache.dir
-/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/pybind11/CMakeFiles/rebuild_cache.dir
-/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/pybind11/CMakeFiles/list_install_components.dir
-/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/pybind11/CMakeFiles/install.dir
-/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/pybind11/CMakeFiles/install/local.dir
-/Users/cedricgaberle/CLionProjects/QasmParser/Library/build/pybind11/CMakeFiles/install/strip.dir

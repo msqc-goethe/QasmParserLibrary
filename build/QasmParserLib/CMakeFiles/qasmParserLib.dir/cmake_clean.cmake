@@ -1,6 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/qasmParserLib.dir/src/benchmarkSuite.cpp.o"
-  "CMakeFiles/qasmParserLib.dir/src/benchmarkSuite.cpp.o.d"
   "CMakeFiles/qasmParserLib.dir/src/parser.cpp.o"
   "CMakeFiles/qasmParserLib.dir/src/parser.cpp.o.d"
   "libqasmParserLib.dylib"

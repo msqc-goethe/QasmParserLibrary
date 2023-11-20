@@ -1,1 +1,1 @@
-/usr/local/lib/python3.10/site-packages/openQasmParser.cpython-310-darwin.so
+/Users/cedricgaberle/opt/anaconda3/envs/quantum_env/lib/python3.10/site-packages/openqasmparser.cpython-310-darwin.so
