@@ -25,9 +25,9 @@ namespace qasmparser {
          * and independent operators by having the same (dependent) or different parameters (independent).
          */
         struct QuantumOperator {
-            unsigned long index;                             // Index of operator in input (order of operators)
+            unsigned long index;                             // Index of operator in input (for order of operators)
             std::string strRep;                              // String representation of operator
-            std::vector<std::vector<unsigned long> > intOp;  // Operator in integer representation stored in vector of vectors
+            std::vector<std::vector<unsigned long> > intOp;  // Operator integer representation stored in vector of vectors
             float coef;                                      // Coefficient of operator
             unsigned long param;                             // Parameter indicating dependencies
         };
@@ -35,7 +35,6 @@ namespace qasmparser {
         unsigned long numberQubits;                          // Must equal length of operators in string representation
         std::string mup = "0.5*";                            // Float value to multiply operations as string
         std::vector<QuantumOperator> operators;              // Vector holding all operators as Quantum Operator struct
-        bool openmp;                                         // Specify to use OpenMP parallelism
 
         /**
          * Parse string representation of input into shorter integer representation describing operator. Integer
@@ -81,49 +80,28 @@ namespace qasmparser {
         std::string parseOpToQasm(QuantumOperator &qubitIdx);
 
     public:
-        friend std::string parseCircuitSeq(const std::string &inFilename,
-                                        int version,
-                                        const std::optional<std::string> &outFilename,
-                                        const std::optional<float> &multiplier);
-
         friend std::string parseCircuit(const std::string &inFilename,
-                                        bool useOpenMP,
                                         int version,
+                                        bool useOpenMP,
                                         const std::optional<std::string> &outFilename,
                                         const std::optional<float> &multiplier);
     };
 
     /**
-     * Parse provided circuit ansatz in input .txt file into OpenQASM, store in string member `qasm` and optionally
-     * write to file. Sequential function, no parallel execution.
-     * @param inFilename Path to input file containing circuit in string representation.
-     * @param version If set true, equals OpenQASM version 3; Version 2 for false (default)
-     * @param outFilename Optional; If provided, write OpenQASM representation into this file. Must be .txt file!
-     * @param multiplier Optional; Multiplier to multiply all operators with.
-     * @return OpenQASM version of input file
-     */
-    std::string parseCircuitSeq(const std::string &inFilename,
-                             int version = 2,
-                             const std::optional<std::string> &outFilename = std::nullopt,
-                             const std::optional<float> &multiplier = std::nullopt);
-
-    /**
-     * Overloaded function to use parallelism. If the useOpenMP parameter is set, parallel execution is enabled,
-     * according to the value. If it is not set, fall back to sequential execution.
+     * Parse input file into OpenQASM representation. Parallelism enabled by default if supported. OpenMP or Execution
+     * Policy parallelism implementation.
      * @param inFilename Path to input file containing ansatz circuit in string representation
      * @param useOpenMP True: Use OpenMP as parallel framework; False: Use execution policy as parallel framework
-     * @param version True: Version 3; False: Version 2
+     * @param version Set to integer value specifying version to use. Version 2 by default.
      * @param outFilename Optional; If provided, write OpenQASM representation into this file.
      * @param multiplier Optional; Multiplier to multiply all operators with
      * @return OpenQASM version of input file
      */
     std::string parseCircuit(const std::string &inFilename,
-                             bool useOpenMP,
                              int version = 2,
+                             bool useOpenMP = false,
                              const std::optional<std::string> &outFilename = std::nullopt,
                              const std::optional<float> &multiplier = std::nullopt);
-
-    int test(int a, int b);
 }
 
 #endif //QASM_PARSER_PARSER_H

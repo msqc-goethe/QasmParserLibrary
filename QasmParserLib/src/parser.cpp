@@ -116,7 +116,7 @@ std::vector< std::vector<unsigned long> > qasmparser::Parser::parseStrInt(std::s
 }
 
 std::string qasmparser::Parser::parseOpToQasm(QuantumOperator& qop) {
-    // Parameterised rotation in Z basis. By definition this rotation is done on the last used qubit by the operator
+    // Parameterised rotation in Z basis. By definition this rotation is done on the last used qubit of the operator
     const auto lastUsed = std::max(
             {qop.intOp[0].empty() ? 0 : *std::max_element(qop.intOp[0].begin(), qop.intOp[0].end()),
              qop.intOp[1].empty() ? 0 : *std::max_element(qop.intOp[1].begin(), qop.intOp[1].end()),
@@ -151,7 +151,7 @@ std::string qasmparser::Parser::parseOpToQasm(QuantumOperator& qop) {
 
             case 1:
                 for (auto qubitIdx: vec) {
-                    // Rotation in x basis by -0.5 pi before and +0.5 pi afterwards
+                    // Rotation in x basis by -0.5 pi before and +0.5 pi afterward
                     std::string before = fmt::format("rx(-pi/2) q[{}];\n", qubitIdx - 1);
                     std::string after = fmt::format("rx(pi/2) q[{}];\n", qubitIdx - 1);
 
@@ -193,83 +193,14 @@ std::string qasmparser::Parser::parseOpToQasm(QuantumOperator& qop) {
     return qasmOp.insert(0, fmt::format("\n// New operator from line {}\n", qop.index));
 }
 
-std::string qasmparser::parseCircuitSeq(const std::string& inFilename,
+std::string qasmparser::parseCircuit(const std::string &inFilename,
                                      const int version,
-                                     const std::optional<std::string>& outFilename,
-                                     const std::optional<float>& multiplier) {
-    Parser parser;
-    std::string qasm;
-    std::map<unsigned long, std::string> qasmOperators;
-    if (multiplier.has_value())
-        parser.mup = std::to_string(multiplier.value()) + "*";
-    std::mutex parseOpMtx;
-
-    // Read lines into `operators` vector
-    parser.readLines(inFilename);
-
-    // For each operator: parse string into integer representation, parse into OpenQASM, and store in `qasmOperators`
-    std::for_each(std::execution::par, parser.operators.begin(), parser.operators.end(),
-                  [&](Parser::QuantumOperator op) {
-    //for (auto& op: parser.operators) {
-        try {
-            op.intOp = parser.parseStrInt(op.strRep);
-        }
-        catch (const std::invalid_argument& exception) {
-            parser.printError(exception.what(), op.index);
-        }
-
-        std::string qasmOp = parser.parseOpToQasm(op);
-
-        std::lock_guard<std::mutex> guard(parseOpMtx);
-        qasmOperators[op.index] = qasmOp;
-    });
-
-    // OpenQASM version specific header
-    if (version == 3) {
-        qasm.insert(0, fmt::format("OPENQASM 3.0;\n"
-                                   "include \"stdgates.inc\";\n"
-                                   "qubit[{0}] q;\n"  // Qubit register of size `numberQubits`
-                                   "bit[{0}] c;\n",   // Classical bit register of same size
-                                   parser.numberQubits)
-        );
-    }
-    else {
-        qasm.insert(0, fmt::format("OPENQASM 2.0;\n"
-                                   "include \"qelib1.inc\";\n"
-                                   "qreg q[{0}];\n"   // Qubit register of size `numberQubits`
-                                   "creg c[{0}];\n",  // Classical bit register of same size
-                                   parser.numberQubits)
-        );
-    }
-
-    // Write out OpenQASM representations of operators stored in `qasmOperators`
-    if (!outFilename) {
-        for (const auto& [idx, op] : qasmOperators) {
-            qasm += op;
-        }
-        return qasm;
-    }
-
-    std::ofstream outFile (outFilename.value());
-    if (outFile.is_open()) {
-        outFile << qasm;
-        for (const auto& [idx, op] : qasmOperators) {
-            qasm += op;
-            outFile << op;
-        }
-        outFile.close();
-    }
-
-    return qasm;
-}
-
-std::string qasmparser::parseCircuit(const std::string &inFilename, const bool useOpenMP, const int version,
+                                     const bool useOpenMP,
                                      const std::optional<std::string> &outFilename,
                                      const std::optional<float> &multiplier) {
     Parser p;
     std::map<unsigned long, std::string> qasmOperators;
     std::string qasm;
-    p.openmp = useOpenMP;
 
     if (multiplier.has_value())
         p.mup = std::to_string(multiplier.value()) + "*";
@@ -295,13 +226,10 @@ std::string qasmparser::parseCircuit(const std::string &inFilename, const bool u
             #pragma omp critical (qasmOperator)
             qasmOperators[op.index] = qasmOp;
         }
-    }
-
-    else {
+    } else {
         // For each operator: parse string into integer representation, parse into OpenQASM, and store in `qasmOperators`
         std::for_each(std::execution::par, p.operators.begin(), p.operators.end(),
                       [&](Parser::QuantumOperator op) {
-                          //for (auto& op: parser.operators) {
                           try {
                               op.intOp = p.parseStrInt(op.strRep);
                           }
@@ -335,31 +263,18 @@ std::string qasmparser::parseCircuit(const std::string &inFilename, const bool u
         );
     }
 
-    for (const auto& [idx, op] : qasmOperators) {
+    for (const auto& [idx, op] : qasmOperators)
         qasm += op;
-    }
 
     // Write out OpenQASM representations of operators stored in `qasmOperators`
-    if (!outFilename) {
-        for (const auto& [idx, op] : qasmOperators) {
-            qasm += op;
-        }
+    if (!outFilename)
         return qasm;
-    }
 
     std::ofstream outFile (outFilename.value());
     if (outFile.is_open()) {
         outFile << qasm;
-        for (const auto& [idx, op] : qasmOperators) {
-            qasm += op;
-            outFile << op;
-        }
         outFile.close();
     }
 
     return qasm;
-}
-
-int qasmparser::test(int a, int b){
-    return a + b;
 }
