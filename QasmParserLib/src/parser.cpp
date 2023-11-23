@@ -123,12 +123,11 @@ std::string qasmparser::Parser::parseOpToQasm(QuantumOperator& qop) {
              qop.intOp[2].empty() ? 0 : *std::max_element(qop.intOp[2].begin(), qop.intOp[2].end())}
     );
 
+    std::string qasmOp, beforeLast, afterLast;
     if (Parser::grouping)
-        std::string qasmOp = fmt::format("rz({}{}*$[{}]) q[{}];\n", mup, qop.coef, qop.param, lastUsed - 1);
+        qasmOp = fmt::format("rz({}{}*$[{}]) q[{}];\n", mup, qop.coef, qop.param, lastUsed - 1);
     else
-        std::string qasmOp = fmt::format("rz({}{}) q[{}];\n", mup, qop.coef, qop.param, lastUsed - 1);
-
-    std::string beforeLast, afterLast;
+        qasmOp = fmt::format("rz({}{}) q[{}];\n", mup, qop.coef, lastUsed - 1);
 
     // Go through vector entries indicating pauli matrix on qubits at these indices and therefore rotations in
     // corresponding basis. First vector corresponds to Pauli-X, second to Pauli-Y, third and last to Pauli-Z.
