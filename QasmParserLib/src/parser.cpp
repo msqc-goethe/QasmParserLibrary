@@ -123,7 +123,11 @@ std::string qasmparser::Parser::parseOpToQasm(QuantumOperator& qop) {
              qop.intOp[2].empty() ? 0 : *std::max_element(qop.intOp[2].begin(), qop.intOp[2].end())}
     );
 
-    std::string qasmOp = fmt::format("rz({}{}*$[{}]) q[{}];\n", mup, qop.coef, qop.param, lastUsed - 1);
+    if (Parser::grouping)
+        std::string qasmOp = fmt::format("rz({}{}*$[{}]) q[{}];\n", mup, qop.coef, qop.param, lastUsed - 1);
+    else
+        std::string qasmOp = fmt::format("rz({}{}) q[{}];\n", mup, qop.coef, qop.param, lastUsed - 1);
+
     std::string beforeLast, afterLast;
 
     // Go through vector entries indicating pauli matrix on qubits at these indices and therefore rotations in
@@ -196,12 +200,14 @@ std::string qasmparser::Parser::parseOpToQasm(QuantumOperator& qop) {
 std::string qasmparser::parseCircuit(const std::string &inFilename,
                                      const int version,
                                      const bool useOpenMP,
+                                     const bool grouping,
                                      const std::optional<std::string> &outFilename,
                                      const std::optional<float> &multiplier) {
     Parser p;
     std::map<unsigned long, std::string> qasmOperators;
     std::string qasm;
 
+    p.grouping = grouping;
     if (multiplier.has_value())
         p.mup = std::to_string(multiplier.value()) + "*";
 

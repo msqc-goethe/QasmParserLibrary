@@ -35,6 +35,7 @@ namespace qasmparser {
         unsigned long numberQubits;                          // Must equal length of operators in string representation
         std::string mup = "0.5*";                            // Float value to multiply operations as string
         std::vector<QuantumOperator> operators;              // Vector holding all operators as Quantum Operator struct
+        bool grouping;
 
         /**
          * Parse string representation of input into shorter integer representation describing operator. Integer
@@ -83,6 +84,7 @@ namespace qasmparser {
         friend std::string parseCircuit(const std::string &inFilename,
                                         int version,
                                         bool useOpenMP,
+                                        bool grouping,
                                         const std::optional<std::string> &outFilename,
                                         const std::optional<float> &multiplier);
     };
@@ -100,6 +102,7 @@ namespace qasmparser {
     std::string parseCircuit(const std::string &inFilename,
                              int version = 2,
                              bool useOpenMP = false,
+                             bool grouping = true,
                              const std::optional<std::string> &outFilename = std::nullopt,
                              const std::optional<float> &multiplier = std::nullopt);
 }
