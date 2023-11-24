@@ -123,6 +123,9 @@ std::string qasmparser::Parser::parseOpToQasm(QuantumOperator& qop) {
              qop.intOp[2].empty() ? 0 : *std::max_element(qop.intOp[2].begin(), qop.intOp[2].end())}
     );
 
+    if (lastUsed == 0)
+        return "";
+
     std::string qasmOp, beforeLast, afterLast;
     if (Parser::grouping)
         qasmOp = fmt::format("rz({}{}*$[{}]) q[{}];\n", mup, qop.coef, qop.param, lastUsed - 1);
