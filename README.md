@@ -8,7 +8,8 @@
 
 
 This project implements a library to simplify the generation of OpenQASM files, the de facto standard when it comes to 
-instructing quantum computers. Additionally, the project contains benchmarking files to evaluate performance.
+instructing quantum computers. Additionally, the project contains python bindings to use the library as an extension in 
+python.
 
 ## Description
 
@@ -16,7 +17,7 @@ OpenQASM is considered the de facto standard as an intermediate representation, 
 
 Some advancements in the direction of simplyfing the process have already been done, e.g. the Qiskit library to generate OpenQASM files from the problem's python code implementation.
 
-Here we present an algorithm, implemented as library in C++, who's input is as simple as an text file consisting of strings and numbers. Further, we make use of available resources by utilizing parallel computing frameworks.
+Here we present an algorithm, implemented as library in C++, who's input is as simple as a text file consisting of strings and numbers. Further, we make use of available resources by utilizing parallel computing frameworks.
 
 
 ### Input
@@ -54,96 +55,35 @@ To use parallelism, following frameworks must be installed:
 
 ## How To Use
 
-Since this repository contains the whole project, including the library as well as benchmarking specifics, we can simply
-clone and have everything set up, including a main to work with already linked against the library. The standalone 
-library will be provided in a different repository as well.
+A tutorial on how to install the library as python extension and use it can be found in the accompanying [jupyter 
+notebook](https://github.com/msqc-goethe/QasmParserLibrary).
+
+As a quick setup guide clone the repository and change into the directory. Perform the following commands with
+your appropriate paths.
 
 ```
-# Check out the project
-$ git clone 
-# Go to project root directory
-$ cd QASM-Parser
-# Install Google Benchmark here
-$ <Follow instructions from https://github.com/google/benchmark>
-# Build directory in project directory; may be placed anywhere but data paths should be 
-# in the same directory as the build to run benchmarks, otherwise change benchmark files
-$ cmake -S . -B build/ -DCMAKE_CXX_COMPILER=<gcc; if not default>
-# Build the project
-$ cmake --build build/
+mkdir build && cd build
+cmake .. -DCMAKE_C_COMPILER=/path_or_alias/to/your/gcc-binary -DCMAKE_CXX_COMPILER=/path_or_alias/to/your/g++-binary -DPYTHON_LIBRARY_DIR="<your_path_to_your_site-packages>" -DPYTHON_EXECUTABLE="<your_path_to_your_python_binary>"
+cmake --build .
+cmake --install .
 ```
-
-This builds the whole project. Placing the data in the projects root directory, we can run benchmarks
-or simply use the library in the main. 
-
-### Google Benchmarks
-
-After building the project we can simply run the Google benchmark executables to investigate the runtime
-of different inputs using different strategies, i.e. sequential, parallel execution policy, OpenMP. The executables can
-be found under `build/Benchmarks/Benchmark<specific data>/<executable>`.
+(The compiler must only be provided if the GCC is not yet the default compiler. Quotation marks are necessary!)
 
 ### Parser Library
-To try out the library itself, one can use the `main.cpp` which is already linked against it. The actual library
-provides a single function, which is overloaded to change between sequential and parallel execution on operator level.
-```
-# Sequential execution
-qasmparser::parseCircuit(<path to input file>, <version>, <output file name>, <multiplier>);
+We can specify five different variables. The only variable that must be set is the path to the input file. This variable is positional, meaning we need to specify this variable first when calling the function. All other variables are key-word only. In order to specify them you have to set the variable at call in the standard pythonic way, e.g. *use_omp=True*.
 
-# Parallel execution
-qasmparser::parseCircuit(<path to input file>, <bool to specify OpenMP usage>, <version>, <output file name>, <multiplier>);
-```
+- *version*
+  The version can be set to be OpenQASM v2 or v3. The only real difference is the header specific to that version in the output OpenQASM file. If not provided or set to a value other than 2 or 3, the default version used is version 2.
 
-- Path to input file
-  - String
-- Bool value to specify OpenMP usage
-  - If set, algorithm is used in parallel, otherwise sequential
-  - True: Use OpenMP parallelism
-  - False: Use execution policy parallelism
-- Version
-  - Integer value, by default `2` for OpenQASM version 2
-  - Can be set to `3` to use version 3
-  - Other values are not supported and fall back to version 2
-- Output file name
-  - Optional value specifying path to store OpenQASM representation
-- Multiplier
-  - Optional value to multiply all operators with
+- *use_omp*
+  If parallelization is supported by your system, it is enabled by default. One can, for scientific/benchmarking purposes for example, decide which parallelization framework to use. If set to *True* OpenMP is the underlying parallelization framework, otherwise and by default the C++17 execution policies are used. These have the added advantage of automatic compiler optimization, leaving less room for unnecassary occupancy of resources or errors in general. If one wishes, he can tailor the OpenMP implementation in the C++ library source code to his specific needs.
 
-### Benchmark Suite
-To use some benchmarking tools, we are using the `benchmarkSuite`, part of the library. There we have the option to use the sequential or 
-parallel version of the algorithm, as well as some different parallelization code fractions tried out during the creation 
-of this project. These include the `strToInt` parallelization, where the process from the input string to the then used 
-lighter integer representation of vectors holding the indices of the Pauli operations per operator is parallelized. The 
-`toQasm` parallelism parallelizes the process from extracting these indices and performing necessary rotations to form 
-actual exponentiated unitary in OpenQASM representation. As well as the parallelization also done in the main library ,
-performing best, on the operator level where operators are parsed to their OpenQASM representation in parallel, implying 
-the other two parallelization strategies intrinsically.
+- *grouping*
+  To indicate commuting operators we use the grouping index. This index is visible in the OpenQASM representation as parameter preceeded by an dollar sign. If one does not want to group anyways and may encounter problems with this representation, e.g. when using qiskit simulators, disabling this behaviour can be controlled using this variable
 
-The functions callable form the `benchmarkSuite` are:
-```
-# Operator parallelism + others; OpenMP or execution policy
-bparser::benchmarkPar(<input path>, <useOpenMP>, <strToInt>, <toQasm>, <version>, <multiplier>);
+- *output_fn*
+  If specified, the OpenQASM representation is written to the file in that location. This value is optional. Nevertheless, the output of the function is still accessible in the current session, e.g. stored in a variable bound to that call.
 
-# Only operator parallelism; OpenMP or execution policy
-bparser::benchmarkParOnly(<input path>, <useOpenMP>, <version>, <multiplier>);
-
-# No operator parallelism, but possible others; OpenMP or execution policy
-bparser::benchmarkSeq(<input path>, <useOpenMP>, <strToInt>, <toQasm>, <version>, <multiplier>);
-
-# Sequential execution, no parallelism 
-bparser::benchmarkSeqOnly(<input path>, <version>, <multiplier>);
-```
-
-### Helper Functions
-We also implemented some functions to ensure correctness and perform benchmarking. These fall into two categories, 
-`compare` functions, comparing the output of different approaches to ensure correctness, and `speedup` functions providing
-the possibility to generate a .json file containing different interesting benchmarking statistics, e.g. speedupu of parallel
-vs. sequential, the parallelizable fraction, Amdahl's speedup etc.
-
-```
-# Generate benchmarking values for provided parallelism compared to sequential version
-speedup::executionTimes(<input file>, <useOpenMP>, <opParallel>, <strToInt>, <toQasm>);
-
-# Generate .json file containing benchmarking values for easy accesibility and further research storable in output file
-# Multiple files at once possible
-speedup::generateJson(<file names>, <path to file directory>, <useOpenMP>, <opParallel>, <strToInt>, <toQasm>, <output file>); 
-```
+- *multiplier*
+  Value to be multiplied to each operator. Again, this is an optional parameter which has no default.
 
