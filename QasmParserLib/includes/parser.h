@@ -33,7 +33,7 @@ namespace qasmparser {
         };
 
         unsigned long numberQubits;                          // Must equal length of operators in string representation
-        std::string mup = "0.5*";                            // Float value to multiply operations as string
+        std::string mup = "2*";                            // Float value to multiply operations as string
         std::vector<QuantumOperator> operators;              // Vector holding all operators as Quantum Operator struct
         bool grouping;
 
