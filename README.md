@@ -78,8 +78,8 @@ We can specify five different variables. The only variable that must be set is t
 - *use_omp*
   If parallelization is supported by your system, it is enabled by default. One can, for scientific/benchmarking purposes for example, decide which parallelization framework to use. If set to *True* OpenMP is the underlying parallelization framework, otherwise and by default the C++17 execution policies are used. These have the added advantage of automatic compiler optimization, leaving less room for unnecassary occupancy of resources or errors in general. If one wishes, he can tailor the OpenMP implementation in the C++ library source code to his specific needs.
 
-- *grouping*
-  To indicate commuting operators we use the grouping index. This index is visible in the OpenQASM representation as parameter preceeded by an dollar sign. If one does not want to group anyways and may encounter problems with this representation, e.g. when using qiskit simulators, disabling this behaviour can be controlled using this variable
+- *parameterize*
+  To indicate commuting operators we use the parameterize index. This index is visible in the OpenQASM representation as parameter preceeded by an dollar sign. If one does not want to group anyways and may encounter problems with this representation, e.g. when using qiskit simulators, disabling this behaviour can be controlled using this variable
 
 - *output_fn*
   If specified, the OpenQASM representation is written to the file in that location. This value is optional. Nevertheless, the output of the function is still accessible in the current session, e.g. stored in a variable bound to that call.

@@ -35,7 +35,8 @@ namespace qasmparser {
         unsigned long numberQubits;                          // Must equal length of operators in string representation
         std::string mup = "2*";                            // Float value to multiply operations as string
         std::vector<QuantumOperator> operators;              // Vector holding all operators as Quantum Operator struct
-        bool grouping;
+        bool parameterize;
+        std::vector<unsigned long> parameterIndices;
 
         /**
          * Parse string representation of input into shorter integer representation describing operator. Integer
@@ -80,11 +81,18 @@ namespace qasmparser {
          */
         std::string parseOpToQasm(QuantumOperator &qubitIdx);
 
+        /**
+         * Generate different OpenQASM variables for the parameterization of the ansatz.
+         * @param paramNames Distinct names for the parameter variables. These are the numerating numbers.
+         * @return Qasm string of variable names.
+         */
+        static std::string inputParamQasmVariable(std::vector<unsigned long>& paramNames);
+
     public:
         friend std::string parseCircuit(const std::string &inFilename,
                                         int version,
                                         bool useOpenMP,
-                                        bool grouping,
+                                        bool parameterize,
                                         const std::optional<std::string> &outFilename,
                                         const std::optional<float> &multiplier);
     };
@@ -102,7 +110,7 @@ namespace qasmparser {
     std::string parseCircuit(const std::string &inFilename,
                              int version = 2,
                              bool useOpenMP = false,
-                             bool grouping = true,
+                             bool parameterize = true,
                              const std::optional<std::string> &outFilename = std::nullopt,
                              const std::optional<float> &multiplier = std::nullopt);
 }

@@ -19,7 +19,7 @@ add_subdirectory(QasmParserLib)
 include_directories("${CMAKE_SOURCE_DIR}/QasmParserLib/includes")
 include_directories("${CMAKE_SOURCE_DIR}/PythonWrapper")
 
-find_package(pybind11 REQUIRED)
+find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(openqasmparser
 	"${CMAKE_CURRENT_SOURCE_DIR}/QasmParserLib/src/parser.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/QasmParserLib/includes/parser.h"

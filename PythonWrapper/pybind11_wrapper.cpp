@@ -12,7 +12,7 @@ PYBIND11_MODULE(openqasmparser, m) {
                                                    "@param version: OpenQASM version to use, default 2.\n"
                                                    "@param use_omp: Use OpenMP parallelism, default execution policy "
                                                    "parallelism.\n"
-                                                   "@param grouping: Set true to use indication for grouping commuting "
+                                                   "@param parameterize: Set true to use indication for grouping commuting "
                                                    "operators.\n"
                                                    "@param output_fn: Path to (non-)existing file to store the OpenQASM"
                                                    "representation file. (optional)\n"
@@ -20,9 +20,9 @@ PYBIND11_MODULE(openqasmparser, m) {
                                                    "operator. (optional)",
         py::arg("input_fn"),  // Input file name
         py::kw_only(),
-        py::arg("version") = 2,  // OpenQASM version (default v2)
+        py::arg("version") = 3,  // OpenQASM version (default v3); Parameterization requires v3!
         py::arg("use_omp") = false,   // Specify to use OpenMP parallelism
-        py::arg("grouping") = true,  // Indicate grouping operators
+        py::arg("parameterize") = true,  // Indicate parameterized ansatz
         py::arg_v("output_fn", std::nullopt, "None"),  // Optional output file name
         py::arg_v("multiplier", std::nullopt, "None"));  // Optional multiplier
 }

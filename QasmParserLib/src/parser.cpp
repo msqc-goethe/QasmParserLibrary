@@ -73,6 +73,10 @@ void qasmparser::Parser::readLines(const std::string& filename) {
             if (param == 0)
                 param = lineIdx;
 
+            auto it = std::find(parameterIndices.begin(), parameterIndices.end(), param);
+            if (it == parameterIndices.end())
+                parameterIndices.emplace_back(param);
+
             // Store each line in QuantumOperator struct and push into operators vector
             qop.index = lineIdx; qop.strRep = strRep; qop.coef = coef; qop.param = param;
             operators.emplace_back(qop);
@@ -123,12 +127,13 @@ std::string qasmparser::Parser::parseOpToQasm(QuantumOperator& qop) {
              qop.intOp[2].empty() ? 0 : *std::max_element(qop.intOp[2].begin(), qop.intOp[2].end())}
     );
 
+    // No active qubits in operator
     if (lastUsed == 0)
         return "";
 
     std::string qasmOp, beforeLast, afterLast;
-    if (Parser::grouping)
-        qasmOp = fmt::format("rz({}{}*$[{}]) q[{}];\n", mup, qop.coef, qop.param, lastUsed - 1);
+    if (Parser::parameterize)
+        qasmOp = fmt::format("rz({}{}*param{}) q[{}];\n", mup, qop.coef, qop.param, lastUsed - 1);
     else
         qasmOp = fmt::format("rz({}{}) q[{}];\n", mup, qop.coef, lastUsed - 1);
 
@@ -199,17 +204,24 @@ std::string qasmparser::Parser::parseOpToQasm(QuantumOperator& qop) {
     return qasmOp.insert(0, fmt::format("\n// New operator from line {}\n", qop.index));
 }
 
+std::string qasmparser::Parser::inputParamQasmVariable(std::vector<unsigned long>& paramNames) {
+    std::string paramQasm;
+    for (auto paramName: paramNames)
+        paramQasm += fmt::format("input float param{};\n", paramName);
+    return paramQasm;
+}
+
 std::string qasmparser::parseCircuit(const std::string &inFilename,
                                      const int version,
                                      const bool useOpenMP,
-                                     const bool grouping,
+                                     const bool parameterize,
                                      const std::optional<std::string> &outFilename,
                                      const std::optional<float> &multiplier) {
     Parser p;
     std::map<unsigned long, std::string> qasmOperators;
     std::string qasm;
 
-    p.grouping = grouping;
+    p.parameterize = parameterize;
     if (multiplier.has_value())
         p.mup = std::to_string(multiplier.value()) + "*";
 
@@ -255,21 +267,23 @@ std::string qasmparser::parseCircuit(const std::string &inFilename,
 
     // OpenQASM version specific header
     if (version == 3) {
-        qasm.insert(0, fmt::format("OPENQASM 3.0;\n"
-                                   "include \"stdgates.inc\";\n"
-                                   "qubit[{0}] q;\n"  // Qubit register of size `numberQubits`
-                                   "bit[{0}] c;\n",   // Classical bit register of same size
-                                   p.numberQubits)
-        );
+        qasm += fmt::format("OPENQASM 3.0;\n"
+                            "include \"stdgates.inc\";\n"
+                            "qubit[{0}] q;\n"  // Qubit register of size `numberQubits`
+                            "bit[{0}] c;\n",   // Classical bit register of same size
+                            p.numberQubits);
     }
     else {
-        qasm.insert(0, fmt::format("OPENQASM 2.0;\n"
-                                   "include \"qelib1.inc\";\n"
-                                   "qreg q[{0}];\n"   // Qubit register of size `numberQubits`
-                                   "creg c[{0}];\n",  // Classical bit register of same size
-                                   p.numberQubits)
-        );
+        qasm += fmt::format("OPENQASM 2.0;\n"
+                            "include \"qelib1.inc\";\n"
+                            "qreg q[{0}];\n"   // Qubit register of size `numberQubits`
+                            "creg c[{0}];\n",  // Classical bit register of same size
+                            p.numberQubits);
     }
+
+    // Add parameterization variables to the qasm output
+    if (p.parameterize)
+        qasm += p.inputParamQasmVariable(p.parameterIndices);
 
     for (const auto& [idx, op] : qasmOperators)
         qasm += op;
