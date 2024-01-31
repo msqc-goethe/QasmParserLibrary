@@ -57,7 +57,7 @@ namespace qasmparser {
          * @param coef Coefficient of operator.
          * @param param Parameter of operator.
          */
-        void errorCheck(std::string &str, float &coef, long long &param) const;
+        void errorCheck(std::string &str, float &coef, unsigned long &param) const;
 
         /**
          * Print error message and line of occurrence.

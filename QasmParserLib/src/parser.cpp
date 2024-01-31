@@ -14,7 +14,7 @@
 #include <mutex>
 
 
-void qasmparser::Parser::errorCheck(std::string& str, float& coef, long long& param) const {
+void qasmparser::Parser::errorCheck(std::string& str, float& coef, unsigned long& param) const {
     if (str.empty())
         throw std::invalid_argument("No operator provided!");
     else if (str.length() != numberQubits)
@@ -23,7 +23,7 @@ void qasmparser::Parser::errorCheck(std::string& str, float& coef, long long& pa
         throw std::invalid_argument("Zero coefficient!");
     else if (param < 0)
         throw std::invalid_argument("Negative parameter!");
-    else if (param > std::numeric_limits<unsigned long>::max())
+    else if (param > std::numeric_limits<unsigned long>::max() - 1)
         throw std::invalid_argument("Parameter out of bound!");
 }
 
@@ -44,10 +44,9 @@ void qasmparser::Parser::readLines(const std::string& filename) {
             lineIdx += 1;
             Parser::QuantumOperator qop;
             std::string strRep; float coef; unsigned long param;  // Operator parameters
-            long long checkParam;
 
             std::istringstream is (line);
-            if (!(is >> strRep >> coef >> checkParam)){
+            if (!(is >> strRep >> coef >> param)){
                 inFile.close();
                 printError(std::string("Wrong format!"), lineIdx);
             }
@@ -57,7 +56,7 @@ void qasmparser::Parser::readLines(const std::string& filename) {
                 numberQubits = strRep.length();
 
             // Error checking on input line operator
-            try {errorCheck(strRep, coef, checkParam);}
+            try {errorCheck(strRep, coef, param);}
             catch (const std::invalid_argument& strException) {
                 inFile.close();
                 printError(strException.what(), lineIdx);
@@ -66,8 +65,6 @@ void qasmparser::Parser::readLines(const std::string& filename) {
                 inFile.close();
                 printError(std::string("Unknown Error!"), lineIdx);
             }
-
-            param = checkParam;
 
             // Set independent parameter if provided is 0
             if (param == 0)

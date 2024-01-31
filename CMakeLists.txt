@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS "-Wall -g -O2")
+    set(CMAKE_CXX_FLAGS "-Wall -g -O2 -fPIC")
 	if (APPLE)  # Workaround for MacOS linker issues with GCC since CLT15
 		set(CMAKE_CXX_FLAGS "-ld_classic")
         set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp")
